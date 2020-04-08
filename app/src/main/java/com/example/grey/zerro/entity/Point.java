@@ -3,6 +3,7 @@ package com.example.grey.zerro.entity;
 public class Point {
      private int x;
     private int y;
+    boolean popal=false;
 
 
     public Point(int x, int y) {
