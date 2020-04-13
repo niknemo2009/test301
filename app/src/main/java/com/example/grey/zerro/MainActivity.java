@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 TextView proba;
     CountDownTimer t;
+    int testcheck = 1488;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
