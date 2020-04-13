@@ -2,28 +2,20 @@ package com.example.grey.zerro.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class Game {
-    List<Plaer> gamers=new ArrayList<>();
     String name;
-    final int COUNT_PLAYER=2;
+    Player currentPlayer;
+    List<Player> players = new ArrayList<>();
+    final int MIN_PLAYER_COUNT_TO_START =2;
 
     public Game(String name) {
         this.name = name;
     }
 
-    public static void main(String[] args) {
-        Game game=new Game("testGame");
-        game.add(new Plaer());
-        game.add(new Plaer());
-        Plaer pl=game.getActivePlayer().get(0);
-        ResultShot result=pl.shot(3,7,game.getEnemy(pl));
-    }
-
-    private Plaer getEnemy(Plaer player) {
-        Plaer result=null;
-        for(Plaer temp:gamers){
+    private Player getEnemy(Player player) {
+        Player result=null;
+        for(Player temp: players){
             if(temp!=player){
                 result=temp;
             }
@@ -31,29 +23,31 @@ public class Game {
         return result;
     }
 
-    private List<Plaer> getActivePlayer() {
-        List<Plaer> result=new ArrayList<>();
-        if(gamers.size()<COUNT_PLAYER){
+    private List<Player> getActivePlayer() {
+        List<Player> result=new ArrayList<>();
+        if (players.size()< MIN_PLAYER_COUNT_TO_START){
             return result;
         }
-        for (Plaer temp:  gamers) {
-           if(temp.isNextStep==true){
+        for (Player temp: players) {
+           if (temp.isNextStep==true) {
                result.add(temp);
                break;
            }
-           if(result.size()==0){
-               gamers.get(0).isNextStep=true;
-               result.add(gamers.get(0));
+           if (result.size()==0) {
+               players.get(0).isNextStep=true;
+               result.add(players.get(0));
            }
         }
         return  result;
     }
 
-    private boolean add(Plaer plaer) {
-        boolean result=false;
-        if(!(gamers.size()>COUNT_PLAYER-1)){
-            result=gamers.add(plaer);
+    public boolean addPlayer(Player Player) {
+        boolean result = false;
+
+        if(players.size() < MIN_PLAYER_COUNT_TO_START){
+            result = players.add(Player);
         }
+
         return result;
     }
 

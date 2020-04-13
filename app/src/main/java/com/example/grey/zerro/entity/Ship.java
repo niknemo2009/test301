@@ -6,30 +6,63 @@ import java.util.List;
 public class Ship {
     String name;
     String picture;
-    ShipSize size;
-    Point startPoint;
+    ShipSize shipSize;
+    final Point startPoint;
+    final Point endPoint;
     boolean isHorizontal;
-    boolean isActive = true;
-    List<Point> cells = new ArrayList();
+    boolean isAlive = true;
+    List<ShipCell> shipCells = new ArrayList();
 
-    public Ship(String name, String picture, ShipSize size, Point startPoint, boolean isHorizontal) {
+    public Ship(String name, String picture, Point startPoint, Point endPoint) {
         this.name = name;
         this.picture = picture;
-        this.size = size;
         this.startPoint = startPoint;
-        this.isHorizontal = isHorizontal;
-        setPosition();
+        this.endPoint = endPoint;
+
+        if (this.startPoint.getX() != this.endPoint.getX() && this.startPoint.getY() != this.endPoint.getY())
+            return;
+
+        if (this.startPoint.getY() == this.endPoint.getY())
+            isHorizontal = true;
+        else
+            isHorizontal = false;
+
+        setShipCells();
     }
 
-    private void setPosition() {
-        cells.add(startPoint);
-        int currentY = startPoint.getY();
+    private void setShipCells() {
+        if (this.startPoint.getX() == this.endPoint.getX() && this.startPoint.getY() == this.endPoint.getY()) {
+            ShipCell shipCell = new ShipCellBuilder()
+                    .setPoint(new Point(this.startPoint.getX(), this.startPoint.getY()))
+                    .setShipCellState(ShipCellState.OK)
+                    .build();
+
+            shipCells.add(shipCell);
+            return;
+        }
+
         int currentX = startPoint.getX();
-        for (int i = 1; i < size.countTrub; i++) {
-            int tempY = isHorizontal ? currentY : currentY++;
-            int tempX = isHorizontal ? currentX++ : currentX;
-            Point pointNext = new Point(tempX, tempY);
-            cells.add(pointNext);
+        int currentY = startPoint.getY();
+
+        while (true) {
+            if (isHorizontal && this.startPoint.getX() > this.endPoint.getX())
+                break;
+
+            if (!isHorizontal && this.startPoint.getY() > this.endPoint.getY())
+                break;
+
+            ShipCell shipCell = new ShipCellBuilder()
+                    .setPoint(new Point(currentX, currentY))
+                    .setShipCellState(ShipCellState.OK)
+                    .build();
+
+            shipCells.add(shipCell);
+
+            if (isHorizontal)
+                currentX++;
+
+            if (!isHorizontal)
+                currentY++;
         }
     }
 
@@ -38,31 +71,47 @@ public class Ship {
         return "Ship{" +
                 "name='" + name + '\'' +
                 ", picture='" + picture + '\'' +
-                ", size=" + size +
+                ", size=" + shipSize +
                 ", startPoint=" + startPoint +
                 ", isHorizontal=" + isHorizontal +
-                ", isActive=" + isActive +
+                ", isActive=" + isAlive +
                 '}';
     }
 
-    public ResultShot checkState(int x, int y) {
-        ResultShot result = ResultShot.MILK;
-        int count = 0;
-        for (Point temp : cells) {
-            if ((temp.getX() == x && temp.getY() == y) || temp.popal == true) {
-                count++;
-                temp.popal = true;
+    public ResultShot checkHit(int x, int y) {
+        ResultShot result = ResultShot.MISS;
+        boolean aliveCells = false;
+
+        for (ShipCell shipCell : shipCells) {
+            Point point = shipCell.getPoint();
+
+            if ((point.getX() == x && point.getY() == y)) {
+                shipCell.shipCellState = ShipCellState.HIT;
+                result = ResultShot.HIT;
             }
+
+            if(shipCell.getShipCellState() == ShipCellState.OK)
+                aliveCells = true;
         }
-        result = count == 0 ? result : (count == this.size.countTrub ? ResultShot.KILL : ResultShot.HIT);
+
+        if (!aliveCells){
+            this.isAlive = false;
+            return ResultShot.KILL;
+        }
+
         return result;
     }
 }
-enum ShipSize{
-    SMALL(1),MIDDLE(2),LARDGE(3),SUPER(4);
-    int countTrub;
 
-    ShipSize(int countTrub) {
-        this.countTrub = countTrub;
+enum ShipSize {
+    SMALL(1), MIDDLE(2), LARGE(3), SUPER(4);
+    private int size;
+
+    ShipSize(int size) {
+        this.size = size;
+    }
+
+    public int getSize() {
+        return size;
     }
 }
