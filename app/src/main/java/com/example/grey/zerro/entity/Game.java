@@ -2,11 +2,11 @@ package com.example.grey.zerro.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class Game {
-    List<Plaer> gamers=new ArrayList<>();
+    List<Player> gamers=new ArrayList<>();
     String name;
+    int[] nabirTemplate={1};
     final int COUNT_PLAYER=2;
 
     public Game(String name) {
@@ -15,15 +15,18 @@ public class Game {
 
     public static void main(String[] args) {
         Game game=new Game("testGame");
-        game.add(new Plaer());
-        game.add(new Plaer());
-        Plaer pl=game.getActivePlayer().get(0);
+        game.add(new Player(game.nabirTemplate));
+        game.add(new Player(game.nabirTemplate));
+        Player pl=game.getActivePlayer().get(0);
+        Player pl33=game.getEnemy(pl);
+        pl.flot.get(0).setPosition(new Point(3,4),false);
+        pl33.flot.get(0).setPosition(new Point(5,5),false);
         ResultShot result=pl.shot(3,7,game.getEnemy(pl));
     }
 
-    private Plaer getEnemy(Plaer player) {
-        Plaer result=null;
-        for(Plaer temp:gamers){
+    private Player getEnemy(Player player) {
+        Player result=null;
+        for(Player temp:gamers){
             if(temp!=player){
                 result=temp;
             }
@@ -31,12 +34,12 @@ public class Game {
         return result;
     }
 
-    private List<Plaer> getActivePlayer() {
-        List<Plaer> result=new ArrayList<>();
+    private List<Player> getActivePlayer() {
+        List<Player> result=new ArrayList<>();
         if(gamers.size()<COUNT_PLAYER){
             return result;
         }
-        for (Plaer temp:  gamers) {
+        for (Player temp:  gamers) {
            if(temp.isNextStep==true){
                result.add(temp);
                break;
@@ -49,7 +52,7 @@ public class Game {
         return  result;
     }
 
-    private boolean add(Plaer plaer) {
+    private boolean add(Player plaer) {
         boolean result=false;
         if(!(gamers.size()>COUNT_PLAYER-1)){
             result=gamers.add(plaer);
